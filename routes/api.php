@@ -33,7 +33,7 @@ Route::group([
 ], function () {
     Route::post('/register', 'register');
     Route::post('/login', 'login');
-    Route::get('/logout/{user_id}', 'logout');
+    Route::get('/logout', 'logout');
 });
 
 
@@ -43,6 +43,7 @@ Route::group([
     'prefix' => 'posts',
     'controller' => PostController::class
 ], function () {
+    Route::get('/', 'getAllPosts');
     Route::get('/user/{user_id}', 'viewUserPosts');
     Route::get('/{post_id}', 'viewUserPost');
     Route::post('/', 'createPost');

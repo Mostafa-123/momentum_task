@@ -16,13 +16,13 @@ class AuthController extends Controller
     /**
      * Create User
      * @param Request $request
-     * @return User 
+     * @return User
      */
     public function register(Request $request)
     {
         try {
             //Validated
-            $validateUser = Validator::make($request->all(), 
+            $validateUser = Validator::make($request->all(),
             [
                 'name' => 'required',
                 'phone' => 'required|string|size:11|regex:/^[0-9]+$/',
@@ -61,7 +61,7 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         try {
-            $validateUser = Validator::make($request->all(), 
+            $validateUser = Validator::make($request->all(),
             [
                 'email' => 'required|email',
                 'password' => 'required'
@@ -93,15 +93,16 @@ class AuthController extends Controller
      * Logout The User
      * @param Request $request
      */
-    public function logout($id)
+    public function logout()
     {
-            $user=User::find($id);
+        $user = auth('sanctum')->user();
 
-            if($user){
-                if($user->tokens()->delete()){
+        if ($user) {
+            $user->tokens->each->delete();
 
-                    return apiResponse(201,'',"User Logged out Successfully");
-                }return apiResponse(401,'',"You need to log in first");
-            }return apiResponse(401,'',"This User id not found");
+            return apiResponse(200, [], "User logged out successfully");
+        }
+
+        return apiResponse(401, [], "Unauthenticated");
     }
 }

@@ -19,6 +19,19 @@ class PostController extends Controller
 {
     use ManageFileTrait;
 
+    public function getAllPosts(){
+        $data=[];
+        $posts=Post::orderBy('id','DESC')->get();
+        if(!$posts->isEmpty()){
+            foreach($posts as $post){
+                $data[]=postData($post);
+            }
+            return apiResponse(200,$data,"posts returned successfully");
+        }else{
+            return apiResponse(404,"","there are no posts now");
+        }
+    }
+
     public function createPost(PostRequest $request){
         $user=User::find(Auth::user()->id);
         if($user){
@@ -44,7 +57,7 @@ class PostController extends Controller
         if($post){
             if ($post->user_id !== Auth::user()->id) {
                 return apiResponse(401,'',"Unauthorized action");
-            }    
+            }
             $image=$request->image;
                 if($image && $post->image){
                     $this->deleteFile($post->image);
@@ -64,13 +77,13 @@ class PostController extends Controller
             return apiResponse(201,postData($post),"post updated successfully");
         }return apiResponse(401,'',"This Post id not found");
     }
-    
+
     public function deletePostSoftly($post_id){
         $post=Post::find($post_id);
         if($post){
             if ($post->user_id !== Auth::user()->id) {
                 return apiResponse(401,'',"Unauthorized action");
-            }   
+            }
             $post->delete();
             return apiResponse(201,'',"post deleted successfully");
         }return apiResponse(401,'',"This Post id not found");
@@ -98,7 +111,7 @@ class PostController extends Controller
             if ($post->user_id !== Auth::user()->id) {
                 return apiResponse(401,'',"Unauthorized action");
             }
-            return apiResponse(201,postData($post),"User post");    
+            return apiResponse(201,postData($post),"User post");
         }return apiResponse(401,'',"This Post id not found");
     }
 
@@ -124,7 +137,7 @@ class PostController extends Controller
         if(!$post->isEmpty()){
             if ($post[0]['user_id'] !== $user_id) {
                 return apiResponse(401,'',"Unauthorized action");
-            }   
+            }
             $post = Post::onlyTrashed()->where('id', $post_id)->where('user_id', $user_id)->first();
             $post->restore();
             $post=Post::find($post_id);
@@ -136,7 +149,7 @@ class PostController extends Controller
         $post=Post::find($post_id);
         if($post){
             if($post->image){
-                return $this->getFile($post->image); 
+                return $this->getFile($post->image);
             }
             return apiResponse(401, '', "This post doesn't has image");
         }
